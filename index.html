@@ -14,9 +14,9 @@
   }
 
   :root{
-    /* P2 greens */
-    --green-mid:#9fd7b8;
-    --green-light:#e6f7ee;
+    /* ✅ P2 greens (exact) */
+    --green-light:#d8ebd4;
+    --green-mid:#8cc987;
     --green-dark:#4f9c72;
 
     --ink:#183525;
@@ -24,11 +24,6 @@
     --bad:#ffcccc;
     --ok:#b7f0c8;
     --border:3px;
-
-    /* gender colours (only for subtle UI accents if needed) */
-    --masc:#4f9c72;
-    --fem:#e46ba0;
-    --neut:#4c78a8;
   }
 
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; outline:none;}
@@ -105,24 +100,6 @@
   .flash-bad{ background:var(--bad) !important; border-color:var(--bad) !important; }
   .selected{ border-color:var(--green-dark) !important; }
 
-  /* Big square (for "Kuck a so...") */
-  .bigSquare{
-    width:min(70vmin,90%); aspect-ratio:1/1; background:#fff;
-    border:12px solid var(--green-mid); border-radius:40px; display:grid; place-items:center;
-    position:relative; cursor:pointer;
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
-    transition:transform .12s ease;
-  }
-  .bigSquare:active{ transform:scale(.98); }
-  .bigSquare img{ width:85%; height:85%; object-fit:contain; }
-  .reset{
-    position:absolute; top:14px; right:18px; width:48px; height:48px; border-radius:50%;
-    background:#fff; border:4px solid var(--green-mid); display:grid; place-items:center;
-    font-size:1.4rem; line-height:1; cursor:pointer;
-  }
-  .fade{ animation:fadeIn .35s ease; }
-  @keyframes fadeIn{ from{opacity:0; transform:scale(.9)} to{opacity:1; transform:scale(1)} }
-
   /* Memory */
   .memGrid{
     width:95vw; max-width:1200px;
@@ -150,20 +127,7 @@
     line-height:1.2;
   }
 
-  /* Sentence (Dat ass …) */
-  .sentence{
-    display:flex; align-items:center; gap:min(2.2vmin,16px);
-    flex-wrap:wrap; justify-content:center;
-    font-size:clamp(2rem,4.8vw,3.2rem);
-  }
-  .inlineSq{
-    display:inline-grid; place-items:center; width:min(36vmin,420px); aspect-ratio:1/1;
-    border:10px solid var(--green-mid); border-radius:28px; background:#fff; cursor:pointer;
-    box-shadow:0 8px 24px rgba(0,0,0,.08); transition:transform .12s ease;
-  }
-  .inlineSq:active{ transform:scale(.98); }
-
-  /* ---------- P3 GAME 2 (Spelling) ---------- */
+  /* ---------- GAME 2 (Spelling) ---------- */
   .bigBox{
     width:min(52vmin, 78%); aspect-ratio:1/1; background:#fff; border:10px solid var(--green-mid);
     border-radius:32px; display:grid; place-items:center; box-shadow:0 8px 24px rgba(0,0,0,.08);
@@ -180,7 +144,7 @@
     cursor:pointer; font-size:clamp(1.8rem,5.6vmin,3rem); min-width:3.1rem; text-align:center;
   }
 
-  /* ---------- P3 GAME 3 (Article picker) ---------- */
+  /* ---------- GAME 3 (Article picker) ---------- */
   .row2{ display:flex; gap:min(4vmin,28px); align-items:center; justify-content:center; flex-wrap:wrap; width:96vw; max-width:1200px; }
   .labelBig{ font-size:clamp(2rem,5.6vmin,3.2rem); text-align:center; margin:.4rem 0 1rem; }
   .choices{ display:flex; gap:.6rem; flex-wrap:wrap; justify-content:center; }
@@ -277,7 +241,7 @@
   <button class="iconBtn" id="next">▶</button>
 </div>
 
-<!-- Spill 1: Lauschter a klick op dat richtegt Bild -->
+<!-- Spill 1 -->
 <section class="wrap" id="g1">
   <h1>Lauschter a klick op dat richtegt Bild</h1>
   <div class="grid" id="grid1"></div>
@@ -288,7 +252,7 @@
   </div>
 </section>
 
-<!-- Spill 2: Schreif d’Wuert (aus P3 G2) -->
+<!-- Spill 2 -->
 <section class="wrap hidden" id="g2">
   <h1>Schreif d’Wuert</h1>
   <div class="bigBox" id="spellBox"><img id="spellImg" alt=""></div>
@@ -302,7 +266,7 @@
   </div>
 </section>
 
-<!-- Spill 3: Wiel den Artikel (aus P3 G3) -->
+<!-- Spill 3 -->
 <section class="wrap hidden" id="g3">
   <h1>Wiel den Artikel</h1>
   <div class="row2">
@@ -326,35 +290,30 @@
   </div>
 </section>
 
-<!-- Spill 4: Memory (Bild – Toun) -->
+<!-- Spill 4 -->
 <section class="wrap hidden" id="g4">
   <h1>Memory: Bild – Toun</h1>
   <div class="memGrid" id="memGrid"></div>
   <div><button class="btn" id="memReset">Nei mëschen</button></div>
 </section>
 
-<!-- Spill 5: Sortéierspill (männlech / weiblech / sächlech) -->
+<!-- Spill 5 -->
 <section class="wrap hidden" id="g5">
   <h1>Sortéier no Genre</h1>
+
   <div class="sortLayout">
     <div class="dropCol" data-cat="masc">
-      <div class="dropHeader">
-        <img src="https://i.postimg.cc/MvXhGffV/mannlech.png" alt="männlech">
-      </div>
+      <div class="dropHeader"><img src="https://i.postimg.cc/MvXhGffV/mannlech.png" alt="männlech"></div>
       <div class="dropInner"></div>
     </div>
 
     <div class="dropCol" data-cat="fem">
-      <div class="dropHeader">
-        <img src="https://i.postimg.cc/7fbpLJJz/weiblech.png" alt="weiblech">
-      </div>
+      <div class="dropHeader"><img src="https://i.postimg.cc/7fbpLJJz/weiblech.png" alt="weiblech"></div>
       <div class="dropInner"></div>
     </div>
 
     <div class="dropCol" data-cat="neut">
-      <div class="dropHeader">
-        <img src="https://i.postimg.cc/3dWPw00g/sachlech.png" alt="sächlech">
-      </div>
+      <div class="dropHeader"><img src="https://i.postimg.cc/3dWPw00g/sachlech.png" alt="sächlech"></div>
       <div class="dropInner"></div>
     </div>
   </div>
@@ -374,7 +333,7 @@
 const AUDIO_BASE = "https://github.com/albrechtclaire1007/p2schoulsaachen/raw/refs/heads/main/";
 
 const ITEMS = [
-  { id:'blaisteftsfaarf', label:"d'Bläistëftsfaarf", img:'https://i.postimg.cc/rdxZC1K8/blaisteftsfaarwen.png', audio:"P2__Bl%C3%A4ist%C3%ABftsfaarf.mp3" },
+  { id:'blaisteftsfaarf', label:"d'Bläistëftsfaarf", img:'https://i.postimg.cc/rdxZC1K8/blaisteftsfaarwen.png', audio:"P2__Bläistëftsfaarf.mp3" },
   { id:'buch',           label:"d'Buch",             img:'https://i.postimg.cc/R6msPWHv/buch.png',              audio:"P2__Buch.mp3" },
   { id:'classeur',       label:"de Classeur",        img:'https://i.postimg.cc/5HLKqB6d/classeur.png',          audio:"P2__Classeur.mp3" },
   { id:'gummi',          label:"de Gummi",           img:'https://i.postimg.cc/gXpSMxZd/gummi.png',             audio:"P2__Gummi.mp3" },
@@ -382,34 +341,34 @@ const ITEMS = [
   { id:'lineal',         label:"de Lineal",          img:'https://i.postimg.cc/r0TnhDrT/lineal.png',            audio:"P2__Lineal.mp3" },
   { id:'pech',           label:"de Pech",            img:'https://i.postimg.cc/1nSCW8qq/pech.png',              audio:"P2__Pech.mp3" },
   { id:'schachtel',      label:"d'Schachtel",        img:'https://i.postimg.cc/rDvYrnyn/schachtel.png',         audio:"P2__Schachtel.mp3" },
-  { id:'scheier',        label:"d'Schéier",          img:'https://i.postimg.cc/ZBm7fWdN/scheier.png',           audio:"P2__Sch%C3%A9ier.mp3" },
+  { id:'scheier',        label:"d'Schéier",          img:'https://i.postimg.cc/ZBm7fWdN/scheier.png',           audio:"P2__Schéier.mp3" },
   { id:'schoulsak',      label:"de Schoulsak",       img:'https://i.postimg.cc/cKwkMR65/schoulsak.png',         audio:"P2__Schoulsak.mp3" },
   { id:'schwamm',        label:"de Schwamm",         img:'https://i.postimg.cc/9D4nz5hs/schwamp.png',           audio:"P2__Schwamm.mp3" },
-  { id:'spetzer',        label:"de Spëtzer",         img:'https://i.postimg.cc/BjdwKYZV/spetzer.png',           audio:"P2__Sp%C3%ABtzer.mp3" },
+  { id:'spetzer',        label:"de Spëtzer",         img:'https://i.postimg.cc/BjdwKYZV/spetzer.png',           audio:"P2__Spëtzer.mp3" },
   { id:'tafel',          label:"d'Tafel",            img:'https://i.postimg.cc/VJ3HCGsT/tafel.png',             audio:"P2__Tafel.mp3" },
   { id:'tuschfaarf',     label:"d'Tuschfaarf",       img:'https://i.postimg.cc/McV3b7vp/tuschfaarwen.png',      audio:"P2__Tuschfaarf.mp3" },
-  { id:'blaisteft',      label:"de Bläistëft",       img:'https://i.postimg.cc/5YJ7PXCx/blaisteft.png',         audio:"P2__Bl%C3%A4ist%C3%ABft.mp3" }
+  { id:'blaisteft',      label:"de Bläistëft",       img:'https://i.postimg.cc/5YJ7PXCx/blaisteft.png',         audio:"P2__Bläistëft.mp3" }
 ];
 
-/* Gender sorting target (männlech/weiblech/sächlech) */
+/* Gender sorting target */
 const GENDER = {
-  blaisteft:      'masc',
-  classeur:       'masc',
-  gummi:          'masc',
-  lineal:         'masc',
-  pech:           'masc',
-  schoulsak:      'masc',
-  schwamm:        'masc',
-  spetzer:        'masc',
+  blaisteft:       'masc',
+  classeur:        'masc',
+  gummi:           'masc',
+  lineal:          'masc',
+  pech:            'masc',
+  schoulsak:       'masc',
+  schwamm:         'masc',
+  spetzer:         'masc',
 
-  schachtel:      'fem',
-  scheier:        'fem',
-  tafel:          'fem',
-  tuschfaarf:     'fem',
-  blaisteftsfaarf:'fem',
+  schachtel:       'fem',
+  scheier:         'fem',
+  tafel:           'fem',
+  tuschfaarf:      'fem',
+  blaisteftsfaarf: 'fem',
 
-  buch:           'neut',
-  heft:           'neut'
+  buch:            'neut',
+  heft:            'neut'
 };
 
 /* ===================== UTIL ===================== */
@@ -424,13 +383,18 @@ function shuffle(a){
   return r;
 }
 
+/* ✅ Critical: encode ONLY here */
 async function playSoundFile(file){
-  const src = AUDIO_BASE + file; // file already encoded where needed
+  const src = AUDIO_BASE + encodeURIComponent(file);
   try{
     if(speaker.src !== src) speaker.src = src;
     await speaker.play();
   }catch(e){}
 }
+
+speaker.addEventListener('error', () => {
+  console.warn("Audio failed to load:", speaker.src);
+});
 
 function flash(el, ok){
   el.classList.remove('flash-good','flash-bad');
@@ -503,7 +467,6 @@ function layoutG1(){
     grid1.appendChild(b);
   });
 }
-
 function nextG1(){
   if(bag1.length===0){
     autoAdvance();
@@ -512,16 +475,14 @@ function nextG1(){
   target1 = bag1.pop();
   playSoundFile(target1.audio);
 }
-
 function checkG1(it, el){
   const ok = (target1 && it.id === target1.id);
   flash(el, ok);
   if(ok) setTimeout(nextG1, 280);
 }
-
 play1.onclick = ()=>{ if(target1) playSoundFile(target1.audio); };
 
-/* ===================== GAME 2: Spell the word (P3 G2) ===================== */
+/* ===================== GAME 2: Spell the word ===================== */
 const spellImg = document.getElementById('spellImg');
 const spellSlots = document.getElementById('spellSlots');
 const spellBank = document.getElementById('spellBank');
@@ -532,9 +493,7 @@ const spellBox = document.getElementById('spellBox');
 let bag2 = [];
 let cur2 = null;
 
-function refill2(){
-  bag2 = shuffle([...ITEMS]);
-}
+function refill2(){ bag2 = shuffle([...ITEMS]); }
 
 function setupSpellRound(){
   if(bag2.length===0) refill2();
@@ -548,7 +507,6 @@ function setupSpellRound(){
 
   spellImg.src = cur2.img;
   spellImg.alt = cur2.label;
-
   spellSlots.innerHTML = "";
   spellBank.innerHTML = "";
 
@@ -598,7 +556,6 @@ function setupSpellRound(){
     });
     spellBank.appendChild(l);
   }
-
   shuffled.forEach(addLetter);
 
   function check(){
@@ -613,7 +570,7 @@ function setupSpellRound(){
 spellNext.onclick = setupSpellRound;
 spellSound.onclick = ()=>{ if(cur2) playSoundFile(cur2.audio); };
 
-/* ===================== GAME 3: Article picker (P3 G3) ===================== */
+/* ===================== GAME 3: Article picker ===================== */
 const artImg = document.getElementById('artImg');
 const artWord = document.getElementById('artWord');
 const artChoices = document.getElementById('artChoices');
@@ -653,7 +610,7 @@ function setupArtRound(){
   artImg.alt = g3Cur.label;
   artWord.textContent = `_____ ${noun}`;
 
-  // auto-play the word audio at round start
+  // auto-play
   playSoundFile(g3Cur.audio);
 
   artChoices.innerHTML = "";
@@ -685,7 +642,6 @@ let lockMem = false;
 let firstPick = null;
 let solved = 0;
 
-// choose 8 for memory (feel free to change)
 const MEM_IDS = ['blaisteft','gummi','schwamm','schoulsak','schachtel','spetzer','tuschfaarf','tafel'];
 const MEM_ITEMS = ITEMS.filter(it=> MEM_IDS.includes(it.id));
 
@@ -757,10 +713,9 @@ function flipMem(el, card){
     lockMem = false;
   }, 650);
 }
-
 memReset.onclick = buildMemory;
 
-/* ===================== GAME 5: Gender sorting (drag & drop or click) ===================== */
+/* ===================== GAME 5: Gender sorting ===================== */
 const sortPool = document.getElementById('sortPool');
 const dropCols = document.querySelectorAll('.dropCol');
 
