@@ -1,1 +1,892 @@
+<!DOCTYPE html>
+<html lang="lb">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>P2 – D’Schoulsaachen – Spiller</title>
+
+<style>
+  /* Font */
+  @font-face{
+    font-family:'Schoulschrëft';
+    src:url('https://raw.githubusercontent.com/albrechtclaire1007/schoulschreft/main/schoulschreft_bold%5B2%5D.TTF') format('truetype');
+    font-weight:bold; font-style:normal; font-display:swap;
+  }
+
+  :root{
+    /* P2 greens */
+    --green-mid:#9fd7b8;
+    --green-light:#e6f7ee;
+    --green-dark:#4f9c72;
+
+    --ink:#183525;
+    --white:#fff;
+    --bad:#ffcccc;
+    --ok:#b7f0c8;
+    --border:3px;
+
+    /* gender colours (only for subtle UI accents if needed) */
+    --masc:#4f9c72;
+    --fem:#e46ba0;
+    --neut:#4c78a8;
+  }
+
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; outline:none;}
+  html,body{
+    height:100%; margin:0;
+    background:linear-gradient(135deg,var(--green-light) 0%, var(--green-mid) 55%, var(--green-dark) 100%);
+    color:var(--ink);
+    font-family:'Schoulschrëft', Arial, sans-serif;
+  }
+
+  /* Top bar with arrows */
+  .top{
+    position:sticky; top:8px; z-index:10; display:flex; gap:12px; align-items:center; justify-content:center;
+    background:var(--white); border:var(--border) solid var(--green-dark); border-radius:18px;
+    padding:.35rem .8rem; margin:10px auto; width:fit-content;
+    box-shadow:0 8px 24px rgba(0,0,0,.08);
+  }
+  .iconBtn{
+    border:var(--border) solid var(--ink); background:var(--white); color:var(--ink);
+    padding:.25rem .7rem; border-radius:14px; cursor:pointer; font-size:1.4rem; line-height:1;
+    min-width:2.4rem; display:grid; place-items:center;
+    font-family:'Schoulschrëft', Arial, sans-serif;
+  }
+  .iconBtn:active{ transform:scale(.98); }
+  .flow{opacity:.9; font-size:1rem; padding:0 .4rem; min-width:8ch; text-align:center;}
+  .hidden{display:none !important;}
+
+  .wrap{
+    min-height:100%; display:flex; flex-direction:column; align-items:center;
+    gap:2.2vmin; padding:2.5vmin 3vmin 4vmin;
+  }
+  h1{
+    margin:.2rem 0 0; text-align:center;
+    font-size:clamp(1.9rem,6vmin,4.2rem); color:var(--ink);
+  }
+
+  /* Generic grids / tokens */
+  .grid{
+    width:95vw; max-width:2000px; display:grid; gap:2vmin;
+    grid-template-columns: repeat(auto-fill, minmax(14vmin, 1fr));
+    align-items:stretch;
+  }
+  .imgToken{
+    background:var(--white); border:6px solid var(--green-mid); border-radius:22px;
+    display:grid; place-items:center; aspect-ratio:1/1; cursor:pointer;
+    transition:transform .1s ease, border-color .15s ease, filter .15s ease, background .15s ease;
+    box-shadow:0 10px 26px rgba(0,0,0,.08);
+  }
+  .imgToken:active{ transform:scale(.97); }
+  .imgToken img{ width:90%; height:90%; object-fit:contain; }
+
+  .btn{
+    border:var(--border) solid var(--ink); background:var(--white); color:var(--ink);
+    padding:.45rem .85rem; border-radius:14px; cursor:pointer; font-size:1.05rem;
+    font-family:'Schoulschrëft', Arial, sans-serif;
+    display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+  }
+  .btn:active{ transform:scale(.98); }
+
+  /* image-only sound button */
+  .soundBtn{
+    width:72px; height:54px;
+    border:var(--border) solid var(--ink);
+    background:var(--white);
+    border-radius:16px;
+    cursor:pointer;
+    display:grid; place-items:center;
+    box-shadow:0 8px 18px rgba(0,0,0,.08);
+  }
+  .soundBtn:active{ transform:scale(.98); }
+  .soundBtn img{ width:88%; height:88%; object-fit:contain; }
+
+  .flash-good{ background:var(--ok) !important; border-color:var(--ok) !important; }
+  .flash-bad{ background:var(--bad) !important; border-color:var(--bad) !important; }
+  .selected{ border-color:var(--green-dark) !important; }
+
+  /* Big square (for "Kuck a so...") */
+  .bigSquare{
+    width:min(70vmin,90%); aspect-ratio:1/1; background:#fff;
+    border:12px solid var(--green-mid); border-radius:40px; display:grid; place-items:center;
+    position:relative; cursor:pointer;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+    transition:transform .12s ease;
+  }
+  .bigSquare:active{ transform:scale(.98); }
+  .bigSquare img{ width:85%; height:85%; object-fit:contain; }
+  .reset{
+    position:absolute; top:14px; right:18px; width:48px; height:48px; border-radius:50%;
+    background:#fff; border:4px solid var(--green-mid); display:grid; place-items:center;
+    font-size:1.4rem; line-height:1; cursor:pointer;
+  }
+  .fade{ animation:fadeIn .35s ease; }
+  @keyframes fadeIn{ from{opacity:0; transform:scale(.9)} to{opacity:1; transform:scale(1)} }
+
+  /* Memory */
+  .memGrid{
+    width:95vw; max-width:1200px;
+    display:grid; gap:1.6vmin;
+    grid-template-columns: repeat(auto-fill, minmax(24vmin, 1fr));
+  }
+  .card{ aspect-ratio:5/3; perspective:1000px; cursor:pointer; }
+  .inner{ position:relative; width:100%; height:100%; transform-style:preserve-3d; transition:transform .25s ease; }
+  .flipped .inner{ transform:rotateY(180deg); }
+  .face{
+    position:absolute; inset:0; border-radius:18px; border:6px solid var(--green-mid);
+    backface-visibility:hidden; display:grid; place-items:center; background:#fff;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+  }
+  .front{
+    background:#fff url('https://i.postimg.cc/gnrf0LLw/cardback-p2.png') center/72% no-repeat;
+  }
+  .back{ transform:rotateY(180deg); }
+  .sndWord{
+    font-size:clamp(1.1rem,3.3vmin,1.7rem);
+    padding:.2rem .4rem;
+    text-align:center;
+    width:92%;
+    display:flex; align-items:center; justify-content:center;
+    line-height:1.2;
+  }
+
+  /* Sentence (Dat ass …) */
+  .sentence{
+    display:flex; align-items:center; gap:min(2.2vmin,16px);
+    flex-wrap:wrap; justify-content:center;
+    font-size:clamp(2rem,4.8vw,3.2rem);
+  }
+  .inlineSq{
+    display:inline-grid; place-items:center; width:min(36vmin,420px); aspect-ratio:1/1;
+    border:10px solid var(--green-mid); border-radius:28px; background:#fff; cursor:pointer;
+    box-shadow:0 8px 24px rgba(0,0,0,.08); transition:transform .12s ease;
+  }
+  .inlineSq:active{ transform:scale(.98); }
+
+  /* ---------- P3 GAME 2 (Spelling) ---------- */
+  .bigBox{
+    width:min(52vmin, 78%); aspect-ratio:1/1; background:#fff; border:10px solid var(--green-mid);
+    border-radius:32px; display:grid; place-items:center; box-shadow:0 8px 24px rgba(0,0,0,.08);
+  }
+  .bigBox img{ width:66%; height:66%; object-fit:contain; }
+  .slots{ display:flex; gap:.6rem; flex-wrap:wrap; justify-content:center; padding:.2rem .4rem; }
+  .slot{
+    min-width:3.1rem; min-height:3.8rem; border-bottom:6px solid var(--ink);
+    display:grid; place-items:center; font-size:clamp(1.8rem,5.6vmin,3rem);
+  }
+  .letters{ display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; }
+  .letter{
+    background:#fff; border:4px solid var(--ink); border-radius:12px; padding:.3rem .5rem;
+    cursor:pointer; font-size:clamp(1.8rem,5.6vmin,3rem); min-width:3.1rem; text-align:center;
+  }
+
+  /* ---------- P3 GAME 3 (Article picker) ---------- */
+  .row2{ display:flex; gap:min(4vmin,28px); align-items:center; justify-content:center; flex-wrap:wrap; width:96vw; max-width:1200px; }
+  .labelBig{ font-size:clamp(2rem,5.6vmin,3.2rem); text-align:center; margin:.4rem 0 1rem; }
+  .choices{ display:flex; gap:.6rem; flex-wrap:wrap; justify-content:center; }
+  .choice{
+    background:#fff; border:4px solid var(--ink); border-radius:12px; padding:.35rem .75rem;
+    cursor:pointer; font-size:clamp(1.6rem,4.8vmin,2.2rem); font-family:'Schoulschrëft', Arial, sans-serif;
+  }
+  .score{ font-size:clamp(1rem,2.4vmin,1.2rem); opacity:.85; text-align:center; }
+
+  /* ---------- Gender sorting (männlech/weiblech/sächlech) ---------- */
+  .sortLayout{
+    width:95vw; max-width:1200px;
+    display:grid; gap:1.5vmin;
+    grid-template-columns:repeat(auto-fit,minmax(26vmin,1fr));
+  }
+  .dropCol{
+    min-height:34vmin;
+    background:#fff;
+    border:10px solid var(--green-mid);
+    border-radius:26px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:0.8rem;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+  }
+  .dropHeader{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-bottom:0.6rem;
+  }
+  .dropHeader img{
+    width:min(22vmin,220px);
+    height:auto;
+    object-fit:contain;
+  }
+  .dropInner{
+    flex:1;
+    width:100%;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:0.5rem;
+  }
+  .sortPool{
+    margin-top:1.2rem;
+    display:flex;
+    flex-wrap:wrap;
+    gap:0.8rem;
+    justify-content:center;
+  }
+  .sortItem{
+    width:74px; height:74px;
+    border-radius:18px;
+    border:5px solid var(--green-mid);
+    background:#fff;
+    display:grid; place-items:center;
+    cursor:pointer;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+  }
+  .sortItem img{ width:88%; height:88%; object-fit:contain; }
+
+  /* Finish banner */
+  #endBanner{
+    position:fixed; inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.25);
+    z-index:50;
+  }
+  #endBannerInner{
+    background:#fff; padding:20px 28px;
+    border-radius:18px; border:6px solid var(--green-mid);
+    font-size:clamp(1.4rem,4.2vw,2.2rem);
+  }
+
+  @media (max-width: 420px){
+    .slot{ min-width:2.6rem; min-height:3.2rem; }
+    .letter{ min-width:2.6rem; }
+    .soundBtn{ width:64px; height:50px; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- Top nav -->
+<div class="top">
+  <button class="iconBtn" id="prev">◀</button>
+  <span class="flow" id="flowLabel">1. Spill</span>
+  <button class="iconBtn" id="next">▶</button>
+</div>
+
+<!-- Spill 1: Lauschter a klick op dat richtegt Bild -->
+<section class="wrap" id="g1">
+  <h1>Lauschter a klick op dat richtegt Bild</h1>
+  <div class="grid" id="grid1"></div>
+  <div>
+    <button class="soundBtn" id="play1" aria-label="Toun nach eng Kéier">
+      <img src="https://i.postimg.cc/ZqG1TRbC/lauschter-p2.png" alt="Lauschter">
+    </button>
+  </div>
+</section>
+
+<!-- Spill 2: Schreif d’Wuert (aus P3 G2) -->
+<section class="wrap hidden" id="g2">
+  <h1>Schreif d’Wuert</h1>
+  <div class="bigBox" id="spellBox"><img id="spellImg" alt=""></div>
+  <div class="slots" id="spellSlots"></div>
+  <div class="letters" id="spellBank"></div>
+  <div style="display:flex; gap:.8rem; align-items:center; justify-content:center; flex-wrap:wrap;">
+    <button class="soundBtn" id="spellSound" aria-label="Toun spillen">
+      <img src="https://i.postimg.cc/ZqG1TRbC/lauschter-p2.png" alt="Lauschter">
+    </button>
+    <button class="btn" id="spellNext">Weider</button>
+  </div>
+</section>
+
+<!-- Spill 3: Wiel den Artikel (aus P3 G3) -->
+<section class="wrap hidden" id="g3">
+  <h1>Wiel den Artikel</h1>
+  <div class="row2">
+    <div class="bigBox" style="width:min(46vmin,70%);" id="artBox">
+      <img id="artImg" alt="">
+    </div>
+
+    <div style="min-width:min(46vmin, 70%); max-width:520px;">
+      <div class="labelBig" id="artWord">_____ Numm</div>
+      <div class="choices" id="artChoices"></div>
+
+      <div style="display:flex; gap:.8rem; align-items:center; justify-content:center; flex-wrap:wrap; margin-top:10px;">
+        <button class="soundBtn" id="artSound" aria-label="Toun spillen">
+          <img src="https://i.postimg.cc/ZqG1TRbC/lauschter-p2.png" alt="Lauschter">
+        </button>
+        <button class="btn" id="artNext">Weider</button>
+      </div>
+
+      <div class="score" id="artScore" style="margin-top:10px;">Punkten: 0</div>
+    </div>
+  </div>
+</section>
+
+<!-- Spill 4: Memory (Bild – Toun) -->
+<section class="wrap hidden" id="g4">
+  <h1>Memory: Bild – Toun</h1>
+  <div class="memGrid" id="memGrid"></div>
+  <div><button class="btn" id="memReset">Nei mëschen</button></div>
+</section>
+
+<!-- Spill 5: Sortéierspill (männlech / weiblech / sächlech) -->
+<section class="wrap hidden" id="g5">
+  <h1>Sortéier no Genre</h1>
+  <div class="sortLayout">
+    <div class="dropCol" data-cat="masc">
+      <div class="dropHeader">
+        <img src="https://i.postimg.cc/MvXhGffV/mannlech.png" alt="männlech">
+      </div>
+      <div class="dropInner"></div>
+    </div>
+
+    <div class="dropCol" data-cat="fem">
+      <div class="dropHeader">
+        <img src="https://i.postimg.cc/7fbpLJJz/weiblech.png" alt="weiblech">
+      </div>
+      <div class="dropInner"></div>
+    </div>
+
+    <div class="dropCol" data-cat="neut">
+      <div class="dropHeader">
+        <img src="https://i.postimg.cc/3dWPw00g/sachlech.png" alt="sächlech">
+      </div>
+      <div class="dropInner"></div>
+    </div>
+  </div>
+
+  <p>Klick oder zitt d’Bild an déi richteg Kolonn.</p>
+  <div id="sortPool" class="sortPool"></div>
+</section>
+
+<div id="endBanner">
+  <div id="endBannerInner">Fantastësch! Du bass fäerdeg 🎉</div>
+</div>
+
+<audio id="speaker" preload="auto"></audio>
+
+<script>
+/* ===================== DATA ===================== */
+const AUDIO_BASE = "https://github.com/albrechtclaire1007/p2schoulsaachen/raw/refs/heads/main/";
+
+const ITEMS = [
+  { id:'blaisteftsfaarf', label:"d'Bläistëftsfaarf", img:'https://i.postimg.cc/rdxZC1K8/blaisteftsfaarwen.png', audio:"P2__Bl%C3%A4ist%C3%ABftsfaarf.mp3" },
+  { id:'buch',           label:"d'Buch",             img:'https://i.postimg.cc/R6msPWHv/buch.png',              audio:"P2__Buch.mp3" },
+  { id:'classeur',       label:"de Classeur",        img:'https://i.postimg.cc/5HLKqB6d/classeur.png',          audio:"P2__Classeur.mp3" },
+  { id:'gummi',          label:"de Gummi",           img:'https://i.postimg.cc/gXpSMxZd/gummi.png',             audio:"P2__Gummi.mp3" },
+  { id:'heft',           label:"d'Heft",             img:'https://i.postimg.cc/NymC765s/heft.png',              audio:"P2__Heft.mp3" },
+  { id:'lineal',         label:"de Lineal",          img:'https://i.postimg.cc/r0TnhDrT/lineal.png',            audio:"P2__Lineal.mp3" },
+  { id:'pech',           label:"de Pech",            img:'https://i.postimg.cc/1nSCW8qq/pech.png',              audio:"P2__Pech.mp3" },
+  { id:'schachtel',      label:"d'Schachtel",        img:'https://i.postimg.cc/rDvYrnyn/schachtel.png',         audio:"P2__Schachtel.mp3" },
+  { id:'scheier',        label:"d'Schéier",          img:'https://i.postimg.cc/ZBm7fWdN/scheier.png',           audio:"P2__Sch%C3%A9ier.mp3" },
+  { id:'schoulsak',      label:"de Schoulsak",       img:'https://i.postimg.cc/cKwkMR65/schoulsak.png',         audio:"P2__Schoulsak.mp3" },
+  { id:'schwamm',        label:"de Schwamm",         img:'https://i.postimg.cc/9D4nz5hs/schwamp.png',           audio:"P2__Schwamm.mp3" },
+  { id:'spetzer',        label:"de Spëtzer",         img:'https://i.postimg.cc/BjdwKYZV/spetzer.png',           audio:"P2__Sp%C3%ABtzer.mp3" },
+  { id:'tafel',          label:"d'Tafel",            img:'https://i.postimg.cc/VJ3HCGsT/tafel.png',             audio:"P2__Tafel.mp3" },
+  { id:'tuschfaarf',     label:"d'Tuschfaarf",       img:'https://i.postimg.cc/McV3b7vp/tuschfaarwen.png',      audio:"P2__Tuschfaarf.mp3" },
+  { id:'blaisteft',      label:"de Bläistëft",       img:'https://i.postimg.cc/5YJ7PXCx/blaisteft.png',         audio:"P2__Bl%C3%A4ist%C3%ABft.mp3" }
+];
+
+/* Gender sorting target (männlech/weiblech/sächlech) */
+const GENDER = {
+  blaisteft:      'masc',
+  classeur:       'masc',
+  gummi:          'masc',
+  lineal:         'masc',
+  pech:           'masc',
+  schoulsak:      'masc',
+  schwamm:        'masc',
+  spetzer:        'masc',
+
+  schachtel:      'fem',
+  scheier:        'fem',
+  tafel:          'fem',
+  tuschfaarf:     'fem',
+  blaisteftsfaarf:'fem',
+
+  buch:           'neut',
+  heft:           'neut'
+};
+
+/* ===================== UTIL ===================== */
+const speaker = document.getElementById('speaker');
+
+function shuffle(a){
+  const r=[...a];
+  for(let i=r.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [r[i],r[j]]=[r[j],r[i]];
+  }
+  return r;
+}
+
+async function playSoundFile(file){
+  const src = AUDIO_BASE + file; // file already encoded where needed
+  try{
+    if(speaker.src !== src) speaker.src = src;
+    await speaker.play();
+  }catch(e){}
+}
+
+function flash(el, ok){
+  el.classList.remove('flash-good','flash-bad');
+  void el.offsetWidth;
+  el.classList.add(ok ? 'flash-good' : 'flash-bad');
+  setTimeout(()=> el.classList.remove('flash-good','flash-bad'), 260);
+}
+
+function stripArticle(label){
+  return label
+    .replace(/^d'\s*/i,"")
+    .replace(/^(de|den)\s+/i,"")
+    .trim();
+}
+function articleOf(label){
+  if(label.startsWith("d'")) return "d'";
+  if(label.startsWith("den ")) return "den";
+  return "de";
+}
+
+/* ===================== NAV ===================== */
+const pages = ["g1","g2","g3","g4","g5"];
+let pageIdx = 0;
+const flowLabel = document.getElementById('flowLabel');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+
+function updateNav(){
+  flowLabel.textContent = `${pageIdx+1}. Spill`;
+  prevBtn.classList.toggle('hidden', pageIdx===0);
+  nextBtn.classList.toggle('hidden', pageIdx===pages.length-1);
+}
+function showPage(i){
+  pageIdx = Math.max(0, Math.min(pages.length-1, i));
+  pages.forEach((id,idx)=>document.getElementById(id).classList.toggle('hidden', idx!==pageIdx));
+  updateNav();
+}
+prevBtn.onclick = ()=> showPage(pageIdx-1);
+nextBtn.onclick = ()=> showPage(pageIdx+1);
+
+function autoAdvance(delay=900){
+  setTimeout(()=>{
+    if(pageIdx < pages.length-1) showPage(pageIdx+1);
+  }, delay);
+}
+
+/* ===================== FINISH BANNER ===================== */
+const endBanner = document.getElementById('endBanner');
+function showEnd(){
+  endBanner.style.display = 'flex';
+  setTimeout(()=>{ endBanner.style.display = 'none'; }, 1800);
+}
+
+/* ===================== GAME 1: Listen & click ===================== */
+const grid1 = document.getElementById('grid1');
+const play1 = document.getElementById('play1');
+let bag1 = [];
+let target1 = null;
+
+function layoutG1(){
+  grid1.innerHTML = "";
+  ITEMS.forEach(it=>{
+    const b = document.createElement('button');
+    b.className = 'imgToken';
+    const img = document.createElement('img');
+    img.src = it.img;
+    img.alt = it.label;
+    b.appendChild(img);
+    b.onclick = ()=> checkG1(it, b);
+    grid1.appendChild(b);
+  });
+}
+
+function nextG1(){
+  if(bag1.length===0){
+    autoAdvance();
+    return;
+  }
+  target1 = bag1.pop();
+  playSoundFile(target1.audio);
+}
+
+function checkG1(it, el){
+  const ok = (target1 && it.id === target1.id);
+  flash(el, ok);
+  if(ok) setTimeout(nextG1, 280);
+}
+
+play1.onclick = ()=>{ if(target1) playSoundFile(target1.audio); };
+
+/* ===================== GAME 2: Spell the word (P3 G2) ===================== */
+const spellImg = document.getElementById('spellImg');
+const spellSlots = document.getElementById('spellSlots');
+const spellBank = document.getElementById('spellBank');
+const spellNext = document.getElementById('spellNext');
+const spellSound = document.getElementById('spellSound');
+const spellBox = document.getElementById('spellBox');
+
+let bag2 = [];
+let cur2 = null;
+
+function refill2(){
+  bag2 = shuffle([...ITEMS]);
+}
+
+function setupSpellRound(){
+  if(bag2.length===0) refill2();
+  cur2 = bag2.pop();
+
+  const noun = stripArticle(cur2.label).replace(/\s+/g,'');
+  if(!noun || noun.length<2){
+    setupSpellRound();
+    return;
+  }
+
+  spellImg.src = cur2.img;
+  spellImg.alt = cur2.label;
+
+  spellSlots.innerHTML = "";
+  spellBank.innerHTML = "";
+
+  const letters = [...noun];
+  const shuffled = shuffle(letters);
+
+  const slotEls = letters.map((_ch,i)=>{
+    const s = document.createElement('div');
+    s.className = 'slot';
+    s.dataset.idx = i;
+    s.dataset.ch = '';
+    s.addEventListener('dragover',e=>e.preventDefault());
+    s.addEventListener('drop',e=>{
+      e.preventDefault();
+      const ch = e.dataTransfer.getData('text/plain');
+      if(!s.textContent){
+        s.textContent = ch;
+        s.dataset.ch = ch;
+        check();
+      }
+    });
+    s.addEventListener('click',()=>{
+      if(!s.textContent) return;
+      const ch = s.textContent;
+      s.textContent = '';
+      s.dataset.ch = '';
+      addLetter(ch);
+    });
+    spellSlots.appendChild(s);
+    return s;
+  });
+
+  function addLetter(ch){
+    const l = document.createElement('div');
+    l.className = 'letter';
+    l.textContent = ch;
+    l.draggable = true;
+    l.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain', ch));
+    l.addEventListener('click',()=>{
+      const empty = slotEls.find(s=>!s.textContent);
+      if(empty){
+        empty.textContent = ch;
+        empty.dataset.ch = ch;
+        l.remove();
+        check();
+      }
+    });
+    spellBank.appendChild(l);
+  }
+
+  shuffled.forEach(addLetter);
+
+  function check(){
+    const got = slotEls.map(s=>s.dataset.ch).join('');
+    if(got.length !== letters.length) return;
+    const ok = (got === letters.join(''));
+    flash(spellBox, ok);
+    if(ok) setTimeout(setupSpellRound, 520);
+  }
+}
+
+spellNext.onclick = setupSpellRound;
+spellSound.onclick = ()=>{ if(cur2) playSoundFile(cur2.audio); };
+
+/* ===================== GAME 3: Article picker (P3 G3) ===================== */
+const artImg = document.getElementById('artImg');
+const artWord = document.getElementById('artWord');
+const artChoices = document.getElementById('artChoices');
+const artNext = document.getElementById('artNext');
+const artScoreEl = document.getElementById('artScore');
+const artSound = document.getElementById('artSound');
+const artBox = document.getElementById('artBox');
+
+let g3Main = [];
+let g3Retry = [];
+let g3Mode = 'main';
+let g3Score = 0;
+let g3Cur = null;
+
+function updateArtScore(){ artScoreEl.textContent = `Punkten: ${g3Score}`; }
+
+function setupArtRound(){
+  if(g3Mode==='main' && g3Main.length===0){
+    if(g3Retry.length){
+      g3Mode = 'retry';
+      g3Main = shuffle(g3Retry);
+      g3Retry = [];
+    } else {
+      autoAdvance(300);
+      return;
+    }
+  } else if(g3Mode==='retry' && g3Main.length===0){
+    autoAdvance(300);
+    return;
+  }
+
+  g3Cur = g3Main.pop();
+  const noun = stripArticle(g3Cur.label);
+  const correct = articleOf(g3Cur.label);
+
+  artImg.src = g3Cur.img;
+  artImg.alt = g3Cur.label;
+  artWord.textContent = `_____ ${noun}`;
+
+  // auto-play the word audio at round start
+  playSoundFile(g3Cur.audio);
+
+  artChoices.innerHTML = "";
+  shuffle(["de","den","d'"]).forEach(opt=>{
+    const b = document.createElement('button');
+    b.className = 'choice';
+    b.textContent = opt;
+    b.onclick = ()=>{
+      const ok = (opt === correct);
+      flash(artBox, ok);
+      if(ok){
+        g3Score++;
+        updateArtScore();
+      }else if(g3Mode==='main'){
+        g3Retry.push(g3Cur);
+      }
+      setTimeout(setupArtRound, 480);
+    };
+    artChoices.appendChild(b);
+  });
+}
+artNext.onclick = setupArtRound;
+artSound.onclick = ()=>{ if(g3Cur) playSoundFile(g3Cur.audio); };
+
+/* ===================== GAME 4: Memory (image – sound) ===================== */
+const memGrid = document.getElementById('memGrid');
+const memReset = document.getElementById('memReset');
+let lockMem = false;
+let firstPick = null;
+let solved = 0;
+
+// choose 8 for memory (feel free to change)
+const MEM_IDS = ['blaisteft','gummi','schwamm','schoulsak','schachtel','spetzer','tuschfaarf','tafel'];
+const MEM_ITEMS = ITEMS.filter(it=> MEM_IDS.includes(it.id));
+
+function buildMemory(){
+  memGrid.innerHTML = "";
+  lockMem = false;
+  firstPick = null;
+  solved = 0;
+
+  const cards = [];
+  MEM_ITEMS.forEach(it=>{
+    cards.push({type:'img', key:it.id, it});
+    cards.push({type:'snd', key:it.id, it});
+  });
+
+  shuffle(cards).forEach(card=>{
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.dataset.key = card.key;
+    el.dataset.type = card.type;
+
+    el.innerHTML = `
+      <div class="inner">
+        <div class="face front"></div>
+        <div class="face back">
+          ${
+            card.type==='img'
+            ? `<img src="${card.it.img}" alt="${card.it.label}" style="width:85%; height:85%; object-fit:contain">`
+            : `<div class="sndWord">${card.it.label}</div>`
+          }
+        </div>
+      </div>
+    `;
+
+    el.addEventListener('click', ()=> flipMem(el, card));
+    memGrid.appendChild(el);
+  });
+}
+
+function flipMem(el, card){
+  if(lockMem) return;
+  if(el.classList.contains('flipped')) return;
+
+  el.classList.add('flipped');
+  if(card.type==='snd'){ playSoundFile(card.it.audio); }
+
+  if(!firstPick){ firstPick = el; return; }
+
+  const match =
+    (firstPick.dataset.key === el.dataset.key) &&
+    (firstPick !== el) &&
+    (firstPick.dataset.type !== el.dataset.type);
+
+  lockMem = true;
+
+  setTimeout(()=>{
+    if(match){
+      firstPick.style.pointerEvents = 'none';
+      el.style.pointerEvents = 'none';
+      solved += 1;
+      if(solved === MEM_ITEMS.length){
+        autoAdvance(700);
+      }
+    }else{
+      firstPick.classList.remove('flipped');
+      el.classList.remove('flipped');
+    }
+    firstPick = null;
+    lockMem = false;
+  }, 650);
+}
+
+memReset.onclick = buildMemory;
+
+/* ===================== GAME 5: Gender sorting (drag & drop or click) ===================== */
+const sortPool = document.getElementById('sortPool');
+const dropCols = document.querySelectorAll('.dropCol');
+
+let sortedCount = 0;
+let selectedItem = null;
+let draggedItem = null;
+
+function buildSortGame(){
+  sortPool.innerHTML = "";
+  dropCols.forEach(col=> col.querySelector('.dropInner').innerHTML = '');
+  sortedCount = 0;
+  selectedItem = null;
+  draggedItem = null;
+
+  const toUse = shuffle([...ITEMS]);
+  toUse.forEach(it=>{
+    const btn = document.createElement('button');
+    btn.className = 'sortItem';
+    btn.draggable = true;
+    btn.dataset.id = it.id;
+
+    const img = document.createElement('img');
+    img.src = it.img;
+    img.alt = it.label;
+    btn.appendChild(img);
+
+    btn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      if(btn.classList.contains('placed')) return;
+      if(selectedItem === btn){
+        btn.classList.remove('selected');
+        selectedItem = null;
+      }else{
+        if(selectedItem) selectedItem.classList.remove('selected');
+        selectedItem = btn;
+        btn.classList.add('selected');
+      }
+    });
+
+    btn.addEventListener('dragstart', ()=>{
+      if(btn.classList.contains('placed')) return;
+      draggedItem = btn;
+      if(selectedItem && selectedItem !== btn) selectedItem.classList.remove('selected');
+      selectedItem = btn;
+      btn.classList.add('selected');
+    });
+    btn.addEventListener('dragend', ()=>{ draggedItem = null; });
+
+    sortPool.appendChild(btn);
+  });
+}
+
+dropCols.forEach(col=>{
+  const cat = col.dataset.cat;
+  const inner = col.querySelector('.dropInner');
+
+  col.addEventListener('dragover', (e)=>{
+    if(!draggedItem) return;
+    e.preventDefault();
+  });
+
+  col.addEventListener('drop', (e)=>{
+    e.preventDefault();
+    if(!draggedItem) return;
+    handlePlace(draggedItem, cat, inner, col);
+  });
+
+  col.addEventListener('click', ()=>{
+    if(!selectedItem || selectedItem.classList.contains('placed')) return;
+    handlePlace(selectedItem, cat, inner, col);
+  });
+});
+
+function handlePlace(btn, cat, inner, col){
+  const id = btn.dataset.id;
+  const ok = (GENDER[id] === cat);
+
+  flash(col, ok);
+
+  if(ok){
+    btn.classList.add('placed');
+    btn.classList.remove('selected');
+    btn.draggable = false;
+    btn.style.pointerEvents = 'none';
+    inner.appendChild(btn);
+    sortedCount += 1;
+    selectedItem = null;
+
+    if(sortedCount === ITEMS.length){
+      showEnd();
+    }
+  }else{
+    flash(btn, false);
+  }
+}
+
+/* ===================== INIT ===================== */
+function init(){
+  // Game 1
+  layoutG1();
+  bag1 = shuffle([...ITEMS]);
+  nextG1();
+
+  // Game 2
+  refill2();
+  setupSpellRound();
+
+  // Game 3
+  g3Main = shuffle([...ITEMS]);
+  g3Retry = [];
+  g3Mode = 'main';
+  g3Score = 0;
+  updateArtScore();
+  setupArtRound();
+
+  // Game 4
+  buildMemory();
+
+  // Game 5
+  buildSortGame();
+
+  showPage(0);
+}
+init();
+</script>
+
+</body>
+</html>
 
